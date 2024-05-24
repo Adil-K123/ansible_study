@@ -52,6 +52,21 @@
       group: root
       mode: 0644
 
+  - name: change ServerAdminEmail
+    tags: apache,apache2,email
+    lineinfile:
+      path: /etc/apache2/sites-enabled/000-default.conf
+      regexp: '^\s*ServerAdmin\s+'
+      line: 'ServerAdmin adns@adil.com'
+    register: apache2_email
+
+  - name: apache restart
+    tags: apache,apache2,service,restart
+    service:
+      name: apache2
+      state: restarted
+    when: apache2_email.changed
+
 - hosts: db_servers
   become: true
   tasks:

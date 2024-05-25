@@ -2,8 +2,8 @@
     tags: ubuntu,apache,apache2,php,20.7
     package:
       name: 
-         - "{{ apache_package }}"
-         - "{{ php_package }}"
+         - "{{ apache_package_name }}"
+         - "{{ php_package_name }}"
       state: latest
 
   - name: copy default html file for site
@@ -22,11 +22,4 @@
       regexp: '^(\s*)ServerAdmin\s+.*'
       line: '\1ServerAdmin user@adil.com'
       backrefs: yes
-    register: apache2_email
-
-  - name: apache restart
-    tags: apache,apache2,service,restart
-    service:
-      name: apache2
-      state: restarted
-    when: apache2_email.changed
+    notify: restart_apache

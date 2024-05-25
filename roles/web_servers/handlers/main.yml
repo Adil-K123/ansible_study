@@ -1,0 +1,5 @@
+- name: restart_apache
+  tags: ubuntu,apache,apache2
+  service:
+    name: "{{ apache_package_name }}"
+    state: restarted

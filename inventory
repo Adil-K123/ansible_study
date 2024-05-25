@@ -2,7 +2,7 @@
 192.168.20.10
 
 [web_servers]
-192.168.20.8 apache_package=apache2 php_package=libapache2-mod-php
+192.168.20.8 
 
 [db_servers]
 192.168.20.7 

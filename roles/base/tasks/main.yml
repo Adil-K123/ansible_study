@@ -3,4 +3,13 @@
   authorized_key:
     user: robo
     key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJTNRFmn1R9Xkuh0t2pG407DFtR2CEPfoI37aS7NVDSr ansible
-    
+
+- name: generate sshd_config file from ssh_template_file
+  tags: ssh
+  template:
+    src: "{{ ssh_template_file }}"
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart ssh

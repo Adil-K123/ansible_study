@@ -1,0 +1,6 @@
+- name: adding ssh key for robo
+  tags: always
+  authorized_key:
+    user: robo
+    key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJTNRFmn1R9Xkuh0t2pG407DFtR2CEPfoI37aS7NVDSr ansible
+    

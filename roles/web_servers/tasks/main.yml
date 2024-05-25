@@ -1,0 +1,32 @@
+  - name: install apache and php
+    tags: ubuntu,apache,apache2,php,20.7
+    package:
+      name: 
+         - "{{ apache_package }}"
+         - "{{ php_package }}"
+      state: latest
+
+  - name: copy default html file for site
+    tags: ubuntu,html,apache,apache2,20.7
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: change ServerAdminEmail
+    tags: apache,apache2,email
+    lineinfile:
+      path: /etc/apache2/sites-enabled/000-default.conf
+      regexp: '^(\s*)ServerAdmin\s+.*'
+      line: '\1ServerAdmin user@adil.com'
+      backrefs: yes
+    register: apache2_email
+
+  - name: apache restart
+    tags: apache,apache2,service,restart
+    service:
+      name: apache2
+      state: restarted
+    when: apache2_email.changed

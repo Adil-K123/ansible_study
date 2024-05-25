@@ -1,0 +1,94 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: update repo cache
+    tags: always
+    apt:
+      update_cache: yes
+    changed_when: false
+
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: adding ssh key for robo
+    tags: always
+    authorized_key:
+      user: robo
+      key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJTNRFmn1R9Xkuh0t2pG407DFtR2CEPfoI37aS7NVDSr ansible
+
+
+- hosts: workstations
+  become: true
+  tasks:
+
+  - name: install unzip
+    tags: unzip,workstations
+    package:
+      name: unzip
+      state: latest
+
+  - name: extract and install terraform
+    tags: extract,workstations,terraform
+    unarchive:
+      src: https://releases.hashicorp.com/terraform/1.8.4/terraform_1.8.4_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: true
+      owner: root
+      group: root
+      mode: 0755
+
+
+- hosts: web_servers
+  become: true
+  tasks:
+
+  - name: install apache and php
+    tags: ubuntu,apache,apache2,php,20.7
+    package:
+      name: 
+         - "{{ apache_package }}"
+         - "{{ php_package }}"
+      state: latest
+
+  - name: copy default html file for site
+    tags: ubuntu,html,apache,apache2,20.7
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: change ServerAdminEmail
+    tags: apache,apache2,email
+    lineinfile:
+      path: /etc/apache2/sites-enabled/000-default.conf
+      regexp: '^(\s*)ServerAdmin\s+.*'
+      line: '\1ServerAdmin user@adil.com'
+      backrefs: yes
+    register: apache2_email
+
+  - name: apache restart
+    tags: apache,apache2,service,restart
+    service:
+      name: apache2
+      state: restarted
+    when: apache2_email.changed
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+  - name: install mariadb
+    tags: ubuntu,db,mariadb,20.6
+    package:
+      name: mariadb-server
+      state: latest
+
+  
+ 

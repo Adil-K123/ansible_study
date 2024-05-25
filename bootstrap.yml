@@ -1,0 +1,44 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: update and upgrade
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: add user robo
+    tags: always
+    user:
+      name: robo
+      groups: root
+
+  - name: adding ssh key for robo
+    tags: always
+    authorized_key:
+      user: robo
+      key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJTNRFmn1R9Xkuh0t2pG407DFtR2CEPfoI37aS7NVDSr ansible
+
+  - name: add sudoers file for robo
+    tags: always
+    copy:
+      src: sudoer_robo
+      dest: /etc/sudoers.d/robo
+      owner: root
+      group: root
+      mode: 0440
+
+
+
+     
+
+  
+ 

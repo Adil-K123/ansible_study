@@ -4,11 +4,23 @@
   become: true
   pre_tasks:
 
-  - name: update and upgrade
+  - name: update repo cache
     tags: always
     apt:
-      upgrade: dist
       update_cache: yes
+    changed_when: false
+
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: adding ssh key for robo
+    tags: always
+    authorized_key:
+      user: robo
+      key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJTNRFmn1R9Xkuh0t2pG407DFtR2CEPfoI37aS7NVDSr ansible
+
 
 - hosts: workstations
   become: true
@@ -36,7 +48,7 @@
   tasks:
 
   - name: install apache and php
-    tags: ubuntu,apache,apache2,php,20.11
+    tags: ubuntu,apache,apache2,php,20.7
     package:
       name: 
          - "{{ apache_package }}"
@@ -44,7 +56,7 @@
       state: latest
 
   - name: copy default html file for site
-    tags: ubuntu,html,apache,apache2,20.11
+    tags: ubuntu,html,apache,apache2,20.7
     copy:
       src: default_site.html
       dest: /var/www/html/index.html
@@ -56,8 +68,9 @@
     tags: apache,apache2,email
     lineinfile:
       path: /etc/apache2/sites-enabled/000-default.conf
-      regexp: '^\s*ServerAdmin\s+'
-      line: 'ServerAdmin adns@adil.com'
+      regexp: '^(\s*)ServerAdmin\s+.*'
+      line: '\1ServerAdmin user@adil.com'
+      backrefs: yes
     register: apache2_email
 
   - name: apache restart
@@ -72,7 +85,7 @@
   tasks:
 
   - name: install mariadb
-    tags: ubuntu,db,mariadb,20.9
+    tags: ubuntu,db,mariadb,20.6
     package:
       name: mariadb-server
       state: latest
